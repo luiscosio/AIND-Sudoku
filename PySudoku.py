@@ -10,7 +10,6 @@ rows = 'ABCDEFGHI'
 def play(values_list):
     pygame.init()
 
-
     size = width, height = 700, 700
     screen = pygame.display.set_mode(size)
 
@@ -39,8 +38,11 @@ def play(values_list):
                 if y in (6, 7, 8):  startY = (y * 57) + 165
                 col = digits[x]
                 row = rows[y]
-                string_number = values[row + col]
-                if len(string_number) > 1 or string_number == '' or string_number == '.':
+                #We should use get to avoid KeyError
+                string_number = values.get(row + col)
+                if not string_number:
+                    number = None
+                elif len(string_number) > 1 or string_number == '' or string_number == '.':
                     number = None
                 else:
                     number = int(string_number)
