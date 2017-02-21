@@ -121,19 +121,15 @@ def reduce_puzzle(values):
     solved_values = [box for box in values.keys() if len(values[box]) == 1]
     stalled = False
     while not stalled:
-        # Check how many boxes have a determined value
         solved_values_before = len([box for box in values.keys() if len(values[box]) == 1])
-        # Use the Eliminate Strategy
+        # Use eliminate
         values = eliminate(values)
-        # Use the Only Choice Strategy
+        # Use only_choice
         values = only_choice(values)
-	    # Use the Naked Twins Strategy
+        # Use naked_twins
         values = naked_twins(values)
-        # Check how many boxes have a determined value, to compare
         solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])
-        # If no new values were added, stop the loop.
         stalled = solved_values_before == solved_values_after
-        # Sanity check, return False if there is a box with zero available values:
         if len([box for box in values.keys() if len(values[box]) == 0]):
             return False
     return values
@@ -146,15 +142,12 @@ def search(values):
     Return:
         The resulting sudoku in dictionary form.
     """
-    # First, reduce the puzzle using the previous function
     values = reduce_puzzle(values)
     if values is False:
-        return False ## Failed earlier
+        return False
     if all(len(values[s]) == 1 for s in boxes):
-        return values ## Solved!
-    # Choose one of the unfilled squares with the fewest possibilities
+        return values
     n,s = min((len(values[s]), s) for s in boxes if len(values[s]) > 1)
-    # Now use recurrence to solve each one of the resulting sudokus, and
     for value in values[s]:
         new_sudoku = values.copy()
         assign_value(new_sudoku, s, value)
@@ -170,28 +163,17 @@ def naked_twins(values):
     Returns:
         the values dictionary with the naked twins eliminated from peers.
     """
-    # Find all instances of naked twins
     nt = []
-    # For each unit
     for unit in unitlist:
-        # Fill the cells with some set of values
         values2cell = defaultdict(set)
         for cell in unit:
             values2cell[values[cell]].add(cell)
-        # If there is a set of cells having the same possibble values
-        # and the number of possible values is the same as the power of the set
         for (vals, cells) in iter(values2cell.items()):
-            # Limitation of size == 2 for naked twins set is required for passing the unit tests
-            # Actually without the len(vals) == 2 condition solution will be more general and constraint more restrictive
             if len(vals) == len(cells) and len(vals) == 2:
-               # It is a naked twins for the unit - these values should be distributed amongst the cells
                nt.append((unit, vals, cells))
-    # Eliminate the naked twins as possibilities for their peers
     for (unit, vals, cells) in iter(nt):
         for cell in unit:
-            # Check it is not a cell of current naked twins
             if cell not in cells:
-                 # Remove naked twins values from its unit
                  for v in vals:
                      assign_value(values, cell, values[cell].replace(v, ''))
     return values
