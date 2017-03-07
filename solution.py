@@ -46,7 +46,7 @@ def grid_values(grid):
 
 def display(values):
     """
-    Display the sodoku values as a 2-D grid.
+    Display the sudoku values as a 2-D grid.
     Args:
         The sudoku in dictionary form
     Returns:
